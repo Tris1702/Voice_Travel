@@ -31,4 +31,4 @@ class GeneralState<T, E> {
   }
 }
 
-typedef TranslateTextState = GeneralState<Word, String>;
+typedef TranslateTextState = GeneralState<String, String>;
