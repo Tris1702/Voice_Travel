@@ -52,7 +52,7 @@ class _ExtractedEntityCellState extends State<ExtractedEntityCell> {
           children: [
             const Image(image: AssetImage('assets/images/google-maps.png'), height: 30,width: 30,),
             const SizedBox(width: 10,),
-            Text('Search $text on Google Map', style: const TextStyle(fontSize: 18)),
+            Expanded(child: Text('Search $text on Google Map', style: const TextStyle(fontSize: 18), overflow: TextOverflow.visible,)),
           ],
         ),
       );

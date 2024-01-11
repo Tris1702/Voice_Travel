@@ -6,10 +6,12 @@ import 'package:voice_travel/presentation/router/app_router.dart';
 import 'package:voice_travel/presentation/router/navigator_service.dart';
 import 'package:voice_travel/presentation/screen/home/view.dart';
 
+import 'data/service/database_service.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setUpServiceLocator();
-
+  GetIt.I<DatabaseService>().getDB();
   runApp(const VoiceTravel());
 }
 
@@ -24,6 +26,7 @@ class VoiceTravel extends StatelessWidget {
       child: MaterialApp(
         home: const MyHome(),
         builder: EasyLoading.init(),
+        debugShowCheckedModeBanner: false,
         navigatorKey: GetIt.I<NavigatorService>().navigatorKey,
         onGenerateRoute: (RouteSettings routeSettings) =>
             AppRoute.getAppPage(routeSettings),

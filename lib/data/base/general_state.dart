@@ -1,4 +1,4 @@
-import '../model/word.dart';
+import '../model/translate_record.dart';
 
 enum GeneralStateType {
   initialize,

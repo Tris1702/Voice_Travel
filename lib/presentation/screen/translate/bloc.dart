@@ -7,8 +7,13 @@ import 'package:get_it/get_it.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:voice_travel/core/bloc_base.dart';
+import 'package:voice_travel/core/constance/supported_language.dart';
+import 'package:voice_travel/data/model/translate_record.dart';
+import 'package:voice_travel/data/service/database_service.dart';
 import 'package:voice_travel/domain/repository/entity_extraction_repository.dart';
+import 'package:voice_travel/presentation/router/app_router.dart';
 
+import '../../../data/model/language.dart';
 import '../../../domain/repository/digital_recognition_repository.dart';
 import '../../../domain/repository/translate_repository.dart';
 
@@ -17,13 +22,18 @@ class TranslateBloc extends BlocBase {
   final translator = GetIt.I<TranslateRepository>();
   final recognizer = GetIt.I<DigitalRecognitionRepository>();
   final entityExtractor = GetIt.I<EntityExtractionRepository>();
+  final database = GetIt.I<DatabaseService>();
 
   final sequencePoints = BehaviorSubject<List<List<Offset>>>.seeded(List.empty(growable: true));
   final recognizedText = BehaviorSubject<List<String>>.seeded(List.empty(growable: true));
   final extractedEntities = BehaviorSubject<List<EntityAnnotation>>.seeded(List.empty(growable: true));
   final isWriting = PublishSubject<bool>();
+
   TextEditingController inputTextController = TextEditingController();
   TextEditingController outputTextController = TextEditingController();
+
+  Language sourceLanguage = AppSupportedLanguage.english;
+  Language targetLanguage = AppSupportedLanguage.vietnamese;
 
   late FlutterTts flutterTts;
   @override
@@ -60,6 +70,7 @@ class TranslateBloc extends BlocBase {
   }
 
   void translate() async {
+    print("===> translating....");
     await translator.translateByWord(inputTextController.text).then((result) {
       result.fold(
               (l) => outputTextController.text = inputTextController.text,
@@ -115,5 +126,15 @@ class TranslateBloc extends BlocBase {
     print("===> extracted ${inputEntities.length}");
     extractedEntities.value = inputEntities;
     extractedEntities.sink.add(extractedEntities.value);
+  }
+
+  void addToFavourite() {
+    database.addFav(TranslateRecord(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage, sourceText: inputTextController.text, targetText: outputTextController.text)).then((_) =>
+      Fluttertoast.showToast(msg: "Added to favourite")
+    );
+  }
+
+  void navigateToHistory() {
+    appNavigator.pushed(AppRoute.history);
   }
 }

@@ -5,10 +5,15 @@ import 'package:rxdart/rxdart.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:voice_travel/core/bloc_base.dart';
+import 'package:voice_travel/data/model/language.dart';
 
 import '../../../domain/repository/translate_repository.dart';
 
 class ConversationBloc extends BlocBase {
+
+  var sourceLanguage = "english";
+  var targetLanguage = "vietnamese";
+
   BehaviorSubject<List<Tuple3<String, String, bool>>> conversation = BehaviorSubject<List<Tuple3<String,String, bool>>>.seeded(List.empty(growable: true));
   final BehaviorSubject<bool> isListeningLeft = BehaviorSubject.seeded(false);
   final BehaviorSubject<bool> isListeningRight = BehaviorSubject.seeded(false);

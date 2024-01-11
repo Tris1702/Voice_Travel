@@ -1,19 +1,20 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:get/utils.dart';
 import 'package:voice_travel/presentation/component/text_style.dart';
 import 'package:voice_travel/presentation/screen/conversation/bloc.dart';
 
 import '../../../core/constance/app_color.dart';
-import '../../../data/model/national.dart';
+import '../../../data/model/language.dart';
 
 class MicroWidget extends StatelessWidget {
   const MicroWidget(
       {super.key,
-      required this.national,
+      required this.language,
       required this.bloc,
       required this.isLeft});
-  final National national;
+  final Language language;
   final ConversationBloc bloc;
   final bool isLeft;
 
@@ -22,7 +23,7 @@ class MicroWidget extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(national.name, style: AppTextStyle.headerStyle.copyWith(color: AppColor.backgroundIcon2, fontWeight: FontWeight.bold),),
+        Text(language.name.capitalizeFirst!, style: AppTextStyle.headerStyle.copyWith(color: AppColor.backgroundIcon2, fontWeight: FontWeight.bold),),
         const SizedBox(height: 8,),
         Container(
           decoration: const BoxDecoration(

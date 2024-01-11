@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/utils.dart';
+import 'package:voice_travel/core/constance/supported_language.dart';
+import 'package:voice_travel/data/model/language.dart';
 import 'package:voice_travel/presentation/component/text_style.dart';
 
 import '../../../core/constance/app_color.dart';
@@ -14,8 +17,13 @@ class TranslateScreen extends StatefulWidget {
     super.key,
     this.initalizedOriginalText = '',
     this.initalizedTranslatedText = '',
+    this.sourceLanguage = 'english',
+    this.targetLanguage = 'vietnamese',
   });
 
+
+  String? sourceLanguage;
+  String? targetLanguage;
   String initalizedOriginalText;
   String initalizedTranslatedText;
 
@@ -30,6 +38,8 @@ class _TranslateScreenState extends State<TranslateScreen> {
   @override
   void initState() {
     super.initState();
+    bloc.sourceLanguage = Language.fromName(widget.sourceLanguage!);
+    bloc.targetLanguage = Language.fromName(widget.targetLanguage!);
     bloc.init();
     bloc.inputTextController.text = widget.initalizedOriginalText;
     bloc.outputTextController.text = widget.initalizedTranslatedText;
@@ -80,7 +90,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
               bloc.changeWritingState(false);
               if (bloc.inputTextController.text.isEmpty) {
                 return InkWell(
-                  onTap: () {},
+                  onTap: bloc.navigateToHistory,
                   child: const Icon(Icons.history, color: Colors.black87),
                 );
               } else {
@@ -91,7 +101,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
               }
             } else {
               return InkWell(
-                onTap: () {},
+                onTap: bloc.addToFavourite,
                 child: const Icon(Icons.star_border, color: Colors.black87),
               );
             }
@@ -129,8 +139,8 @@ class _TranslateScreenState extends State<TranslateScreen> {
                             : Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  const Text(
-                                    "English",
+                                  Text(
+                                    widget.sourceLanguage!.capitalizeFirst!,
                                     style: AppTextStyle.subtitle,
                                   ),
                                   const Spacer(),
@@ -192,7 +202,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    "Vietnamese",
+                                    widget.targetLanguage!.capitalizeFirst!,
                                     style: AppTextStyle.subtitle.copyWith(
                                         color: AppColor.backgroundIcon2),
                                   ),
@@ -309,9 +319,9 @@ class _TranslateScreenState extends State<TranslateScreen> {
           ),
           height: 50,
           width: 150,
-          child: const Center(
+          child: Center(
             child: Text(
-              'English',
+              widget.sourceLanguage!.capitalizeFirst!,
               style: AppTextStyle.subtitle,
             ),
           ),
@@ -327,9 +337,9 @@ class _TranslateScreenState extends State<TranslateScreen> {
           ),
           height: 50,
           width: 150,
-          child: const Center(
+          child: Center(
             child: Text(
-              'Vietnamese',
+              widget.targetLanguage!.capitalizeFirst!,
               style: AppTextStyle.subtitle,
             ),
           ),

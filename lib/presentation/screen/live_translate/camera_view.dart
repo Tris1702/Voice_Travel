@@ -6,7 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../domain/repository/translate_repository.dart';
 import 'bloc.dart';
 
 class CameraView extends StatefulWidget {
@@ -42,6 +45,7 @@ class _CameraViewState extends State<CameraView> {
   double _minAvailableZoom = 1.0;
   double _maxAvailableZoom = 1.0;
   bool _changingCameraLens = false;
+  bool _torchOn = false;
 
   @override
   void initState() {
@@ -78,9 +82,9 @@ class _CameraViewState extends State<CameraView> {
   }
 
   Widget _liveFeedBody() {
-    if (_cameras.isEmpty) return Container(color: Colors.grey,);
-    // if (bloc.controller == null) return Container(color: Colors.green,);
-    if (bloc.controller?.value.isInitialized == false) return Container(color: Colors.red,);
+    if (_cameras.isEmpty) return Container();
+    if (bloc.controller == null) return Container();
+    if (bloc.controller?.value.isInitialized == false) return Container();
     return Container(
       color: Colors.black,
       child: Stack(
@@ -101,6 +105,7 @@ class _CameraViewState extends State<CameraView> {
           _detectionViewModeToggle(),
           _captureToggle(),
           _zoomControl(),
+          _torchControl(),
         ],
       ),
     );
@@ -132,7 +137,7 @@ class _CameraViewState extends State<CameraView> {
           width: 50.0,
           child: FloatingActionButton(
             heroTag: Object(),
-            onPressed: widget.onDetectorViewModeChanged,
+            onPressed: _openGallery,
             backgroundColor: Colors.black54,
             child: const Icon(
               Icons.photo_library_outlined,
@@ -152,12 +157,7 @@ class _CameraViewState extends State<CameraView> {
             heroTag: Object(),
             onPressed: _switchLiveCamera,
             backgroundColor: Colors.black54,
-            child: Icon(
-              Platform.isIOS
-                  ? Icons.flip_camera_ios_outlined
-                  : Icons.flip_camera_android_outlined,
-              size: 25,
-            ),
+            child: const Icon(Icons.flip_camera_ios_outlined, size: 25,),
           ),
         ),
       );
@@ -224,6 +224,28 @@ class _CameraViewState extends State<CameraView> {
           ]),
         ),
       );
+
+  Widget _torchControl() {
+    return Positioned(
+      right: 8,
+      top: 40,
+      child: SizedBox(
+        height: 50.0,
+        width: 50.0,
+        child: FloatingActionButton(
+          heroTag: Object(),
+          onPressed: () {
+            setState(() {
+              _torchOn = !_torchOn;
+              _torchOn? bloc.controller?.setFlashMode(FlashMode.torch) : bloc.controller?.setFlashMode(FlashMode.off);
+            });
+          },
+          backgroundColor: Colors.black54,
+          child: _torchOn ? const Icon(Icons.flashlight_on, size: 25,) : const Icon(Icons.flashlight_off, size: 25,),
+        ),
+      ),
+    );
+  }
 
   Future _startLiveFeed() async {
     final camera = _cameras[_cameraIndex];
@@ -338,5 +360,35 @@ class _CameraViewState extends State<CameraView> {
         bytesPerRow: plane.bytesPerRow,
       ),
     );
+  }
+
+  final translator = GetIt.I<TranslateRepository>();
+  final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+
+  Future<List<String>> translateImageFromGallery(String path) async {
+    final inputImage = InputImage.fromFilePath(path);
+    final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+
+    String text = recognizedText.text;
+    String translatedText = '';
+    await translator.translateByWord(text).then((value) =>
+        value.fold(
+                (l) => null,
+                (r) => translatedText = r.toString())
+    );
+    return [text, translatedText];
+  }
+
+  void _openGallery() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      await translateImageFromGallery(pickedFile.path).then((value) {
+        String text = value.first;
+        String translatedText = value.last;
+        bloc.showResult(text, translatedText);
+      });
+
+    }
   }
 }

@@ -5,13 +5,17 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_travel/presentation/screen/conversation/bloc.dart';
 
 import '../../../core/constance/app_color.dart';
-import '../../../data/model/national.dart';
+import '../../../data/model/language.dart';
 import 'conversation_cell.dart';
 import 'micro_component.dart';
 
 class ConversationScreen extends StatefulWidget {
-  const ConversationScreen({super.key});
+  const ConversationScreen({
+    super.key, required this.sourceLanguage, required this.targetLanguage
+  });
 
+  final String sourceLanguage;
+  final String targetLanguage;
   @override
   State<ConversationScreen> createState() => _ConversationScreenState();
 }
@@ -30,9 +34,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   void initState() {
+    bloc.sourceLanguage = widget.sourceLanguage;
+    bloc.targetLanguage = widget.targetLanguage;
     Permission.microphone.onGrantedCallback(() => bloc.init());
     super.initState();
     _requestPermission();
+  }
+
+  @override
+  void dispose() {
+    bloc.dispose();
+    super.dispose();
   }
 
   @override
@@ -100,12 +112,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               MicroWidget(
-                national: const National(name: "English", code: "en"),
+                language: Language.fromName(bloc.sourceLanguage),
                 bloc: bloc,
                 isLeft: true,
               ),
               MicroWidget(
-                national: const National(name: "VietNam", code: "vi"),
+                language: Language.fromName(bloc.targetLanguage),
                 bloc: bloc,
                 isLeft: false,
               ),

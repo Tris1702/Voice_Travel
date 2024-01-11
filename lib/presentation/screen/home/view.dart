@@ -39,7 +39,7 @@ class _MyHomeState extends State<MyHome> {
         centerTitle: true,
         leading: Center(
           child: InkWell(
-            onTap: () {},
+            onTap: bloc.navigateToFavourite,
             child: const FaIcon(FontAwesomeIcons.solidStar, color: Colors.black87,),
           ),
         ),
@@ -85,35 +85,29 @@ class _MyHomeState extends State<MyHome> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          height: 50,
-          width: 150,
-          child: const Center(
-            child: Text(
-              'English', style: AppTextStyle.subtitle,
-            ),
-          ),
+        StreamBuilder(
+          stream: bloc.sourceLanguage.stream,
+          builder: (_, snapshot) {
+            if (!snapshot.hasData) {
+              return Container();
+            } else {
+              return _languageCard(true, snapshot.data as String);
+            }
+          }
         ),
         InkWell(
             onTap: () {},
             child: const Icon(Icons.sync_alt_outlined),
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          height: 50,
-          width: 150,
-          child: const Center(
-            child: Text(
-              'Vietnamese', style: AppTextStyle.subtitle,
-            ),
-          ),
+        StreamBuilder(
+            stream: bloc.targetLanguage.stream,
+            builder: (_, snapshot) {
+              if (!snapshot.hasData) {
+                return Container();
+              } else {
+                return _languageCard(false, snapshot.data as String);
+              }
+            }
         ),
       ],
     );
@@ -171,6 +165,26 @@ class _MyHomeState extends State<MyHome> {
           ],
         )
       ],
+    );
+  }
+
+  Widget _languageCard(bool isSourceLanguage, String language) {
+    return GestureDetector(
+      onTap: () => bloc.navigateToChangeLanguage(isSourceLanguage, language),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        height: 50,
+        width: 150,
+        child: Center(
+          child: Text(
+            language,
+            style: AppTextStyle.subtitle,
+          ),
+        ),
+      ),
     );
   }
 }

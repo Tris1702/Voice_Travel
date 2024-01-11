@@ -2,6 +2,7 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/utils.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_travel/presentation/screen/voice/bloc.dart';
@@ -10,7 +11,10 @@ import '../../../core/constance/app_color.dart';
 import '../../component/text_style.dart';
 
 class VoiceTranslateScreen extends StatefulWidget {
-  const VoiceTranslateScreen({super.key});
+  const VoiceTranslateScreen({super.key, required this.sourceLanguage, required this.targetLanguage});
+
+  final String sourceLanguage;
+  final String targetLanguage;
 
   @override
   State<VoiceTranslateScreen> createState() => _VoiceTranslateScreenState();
@@ -82,8 +86,8 @@ class _VoiceTranslateScreenState extends State<VoiceTranslateScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Text(
-                          "English",
+                        Text(
+                          widget.sourceLanguage.capitalizeFirst!,
                           style: AppTextStyle.subtitle,
                         ),
                         const Spacer(),
@@ -134,7 +138,7 @@ class _VoiceTranslateScreenState extends State<VoiceTranslateScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "Vietnamese",
+                          widget.targetLanguage.capitalizeFirst!,
                           style: AppTextStyle.subtitle.copyWith(
                               color: AppColor.backgroundIcon2),
                         ),
@@ -210,50 +214,5 @@ class _VoiceTranslateScreenState extends State<VoiceTranslateScreen> {
         ],
       ),
     );
-  }
-
-  Widget _annotationExtractions() {
-    return StreamBuilder(
-        stream: bloc.annotations.stream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Container();
-          } else {
-            final annotations = snapshot.data as List<Entity>;
-
-            return ListView.builder(
-                itemCount: annotations.length,
-                itemBuilder: (context, index) {
-                  return Row(
-                    children: [
-                      _getIconAnnotation(annotations.elementAt(index).type),
-                      Text(annotations.elementAt(index).rawValue)
-                    ],
-                  );
-                }
-            );
-          }
-        }
-    );
-  }
-
-  Widget _getIconAnnotation(EntityType type) {
-    switch (type) {
-      case EntityType.address:
-        return const Icon(Icons.map);
-      case EntityType.phone:
-        return const Icon(Icons.phone);
-      case EntityType.dateTime:
-        return const Icon(Icons.calendar_month);
-      case EntityType.email:
-        return const Icon(Icons.alternate_email_outlined);
-      case EntityType.flightNumber:
-        return const Icon(Icons.airplanemode_active);
-      case EntityType.url:
-        return const Icon(Icons.link);
-      default:
-        return Container();
-    }
-
   }
 }

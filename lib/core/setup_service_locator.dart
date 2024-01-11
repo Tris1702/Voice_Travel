@@ -1,9 +1,9 @@
 import 'package:get_it/get_it.dart';
 import 'package:voice_travel/data/repository/digital_recognition_repository.dart';
 import 'package:voice_travel/data/repository/translate_repository.dart';
+import 'package:voice_travel/data/service/database_service.dart';
 import 'package:voice_travel/data/service/google_ml_service.dart';
 import 'package:voice_travel/domain/repository/translate_repository.dart';
-import 'package:voice_travel/domain/usecase/translate_by_text.dart';
 import 'package:voice_travel/presentation/screen/live_translate/bloc.dart';
 
 import '../data/repository/entity_extraction_repository.dart';
@@ -22,13 +22,11 @@ void setUpServiceLocator() {
   getIt.registerLazySingleton<DigitalRecognitionRepository>(() => DigitalRecognitionRepositoryImpl());
   getIt.registerLazySingleton<EntityExtractionRepository>(() => EntityExtractionRepositoryImpl());
 
-  // UseCase
-  getIt.registerLazySingleton<TranslateByTextUseCase>(() => TranslateByTextUseCase());
-
   // Service
   getIt.registerSingleton<GoogleMLTranslator>(GoogleMLTranslator());
   getIt.registerSingleton<GoogleMLDigitalRecognition>(GoogleMLDigitalRecognition());
   getIt.registerSingleton<GoogleMLEntityExtraction>(GoogleMLEntityExtraction());
+  getIt.registerLazySingleton<DatabaseService>(() => DatabaseService());
 
   // Bloc
   getIt.registerLazySingleton<CameraBloc>(() => CameraBloc());
