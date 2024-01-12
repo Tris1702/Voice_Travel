@@ -29,6 +29,13 @@ class HistoryBloc extends BlocBase {
     translateHistories.sink.add(List.empty());
   }
 
+  removeRecord(int index) async {
+    await database.deleteFav(translateHistories.value.elementAt(index)).then((_) {
+      translateHistories.value.removeAt(index);
+      translateHistories.sink.add(translateHistories.value);
+    });
+  }
+
   navigateBack() {
     appNavigator.pop();
   }

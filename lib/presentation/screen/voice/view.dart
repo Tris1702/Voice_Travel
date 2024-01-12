@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_travel/presentation/screen/voice/bloc.dart';
 
 import '../../../core/constance/app_color.dart';
+import '../../../data/model/language.dart';
 import '../../component/text_style.dart';
 
 class VoiceTranslateScreen extends StatefulWidget {
@@ -33,6 +34,8 @@ class _VoiceTranslateScreenState extends State<VoiceTranslateScreen> {
   }
   @override
   void initState() {
+    bloc.sourceLanguage = Language.fromName(widget.sourceLanguage);
+    bloc.targetLanguage = Language.fromName(widget.targetLanguage);
     Permission.microphone.onGrantedCallback(() => bloc.init());
     super.initState();
     _requestPermission();
@@ -113,14 +116,18 @@ class _VoiceTranslateScreenState extends State<VoiceTranslateScreen> {
                         ),
                       ],
                     ),
-                    TextField(
-                      controller: bloc.inputTextController,
-                      style: AppTextStyle.translateWord2,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
+                    SizedBox(
+                      height: MediaQuery.sizeOf(context).height * 0.3,
+                      child: TextField(
+                        controller: bloc.inputTextController,
+                        style: AppTextStyle.translateWord2,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        maxLines: null,
+                        onEditingComplete: bloc.extractEntity,
+                        enabled: false,
                       ),
-                      onEditingComplete: bloc.extractEntity,
-                      enabled: false,
                     ),
                     const SizedBox(
                       height: 10,
@@ -165,12 +172,16 @@ class _VoiceTranslateScreenState extends State<VoiceTranslateScreen> {
                         ),
                       ],
                     ),
-                    TextField(
-                      controller: bloc.outputTextController,
-                      style: AppTextStyle.translateWord3,
-                      enabled: false,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
+                    SizedBox(
+                      height: MediaQuery.sizeOf(context).height * 0.3,
+                      child: TextField(
+                        controller: bloc.outputTextController,
+                        style: AppTextStyle.translateWord3,
+                        enabled: false,
+                        maxLines: null,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                     const SizedBox(

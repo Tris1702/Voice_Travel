@@ -21,12 +21,10 @@ class TranslateScreen extends StatefulWidget {
     this.targetLanguage = 'vietnamese',
   });
 
-
   String? sourceLanguage;
   String? targetLanguage;
   String initalizedOriginalText;
   String initalizedTranslatedText;
-
 
   @override
   State<TranslateScreen> createState() => _TranslateScreenState();
@@ -43,6 +41,10 @@ class _TranslateScreenState extends State<TranslateScreen> {
     bloc.init();
     bloc.inputTextController.text = widget.initalizedOriginalText;
     bloc.outputTextController.text = widget.initalizedTranslatedText;
+    if (widget.initalizedOriginalText.isNotEmpty &&
+        widget.initalizedTranslatedText.isNotEmpty) {
+      bloc.addToHistory();
+    }
   }
 
   @override
@@ -72,9 +74,9 @@ class _TranslateScreenState extends State<TranslateScreen> {
         ),
         actions: [
           InkWell(
-            onTap: () => _showExtractedEntities(context),
-            child: const Icon(Icons.lightbulb_outline , color: Colors.black87)
-          ),
+              onTap: () => _showExtractedEntities(context),
+              child:
+                  const Icon(Icons.lightbulb_outline, color: Colors.black87)),
           const SizedBox(
             width: 10,
           ),
@@ -132,40 +134,45 @@ class _TranslateScreenState extends State<TranslateScreen> {
                         height: 100,
                       ),
                       KeyboardVisibilityBuilder(
-                        builder: (context, isKeyboardVisible) => isKeyboardVisible
-                            ? const SizedBox(
-                                height: 0,
-                              )
-                            : Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    widget.sourceLanguage!.capitalizeFirst!,
-                                    style: AppTextStyle.subtitle,
+                        builder: (context, isKeyboardVisible) {
+                          if (isKeyboardVisible) {
+                            return const SizedBox(
+                              height: 0,
+                            );
+                          } else {
+                            bloc.addToHistory();
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  widget.sourceLanguage!.capitalizeFirst!,
+                                  style: AppTextStyle.subtitle,
+                                ),
+                                const Spacer(),
+                                InkWell(
+                                  onTap: bloc.copyInputText,
+                                  child: const Icon(
+                                    Icons.copy,
+                                    color: Colors.black87,
                                   ),
-                                  const Spacer(),
-                                  InkWell(
-                                    onTap: bloc.copyInputText,
-                                    child: const Icon(
-                                      Icons.copy,
-                                      color: Colors.black87,
-                                    ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                  onTap: bloc.readInputText,
+                                  child: const Icon(
+                                    Icons.volume_up_outlined,
+                                    color: Colors.black87,
                                   ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  InkWell(
-                                    onTap: bloc.readInputText,
-                                    child: const Icon(
-                                      Icons.volume_up_outlined,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                              ],
+                            );
+                          }
+                        },
                       ),
                       SizedBox(
                         height: MediaQuery.sizeOf(context).height * 0.3,
@@ -194,41 +201,42 @@ class _TranslateScreenState extends State<TranslateScreen> {
                         height: 10,
                       ),
                       KeyboardVisibilityBuilder(
-                        builder: (context, isKeyboardVisible) => isKeyboardVisible
-                            ? const SizedBox(
-                                height: 0,
-                              )
-                            : Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    widget.targetLanguage!.capitalizeFirst!,
-                                    style: AppTextStyle.subtitle.copyWith(
-                                        color: AppColor.backgroundIcon2),
+                        builder: (context, isKeyboardVisible) =>
+                            isKeyboardVisible
+                                ? const SizedBox(
+                                    height: 0,
+                                  )
+                                : Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        widget.targetLanguage!.capitalizeFirst!,
+                                        style: AppTextStyle.subtitle.copyWith(
+                                            color: AppColor.backgroundIcon2),
+                                      ),
+                                      const Spacer(),
+                                      InkWell(
+                                        onTap: bloc.copyOutputText,
+                                        child: const Icon(
+                                          Icons.copy,
+                                          color: AppColor.backgroundIcon2,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      InkWell(
+                                        onTap: bloc.readOutputText,
+                                        child: const Icon(
+                                          Icons.volume_up_outlined,
+                                          color: AppColor.backgroundIcon2,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                    ],
                                   ),
-                                  const Spacer(),
-                                  InkWell(
-                                    onTap: bloc.copyOutputText,
-                                    child: const Icon(
-                                      Icons.copy,
-                                      color: AppColor.backgroundIcon2,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  InkWell(
-                                    onTap: bloc.readOutputText,
-                                    child: const Icon(
-                                      Icons.volume_up_outlined,
-                                      color: AppColor.backgroundIcon2,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                ],
-                              ),
                       ),
                       SizedBox(
                         height: MediaQuery.sizeOf(context).height * 0.3,
@@ -259,15 +267,14 @@ class _TranslateScreenState extends State<TranslateScreen> {
             height: 20,
           ),
           StreamBuilder(
-            stream: bloc.isWriting.stream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data == true) {
-                return _inkText();
-              } else {
-                return Container();
-              }
-            }
-          )
+              stream: bloc.isWriting.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data == true) {
+                  return _inkText();
+                } else {
+                  return Container();
+                }
+              })
         ],
       ),
     );
@@ -278,34 +285,41 @@ class _TranslateScreenState extends State<TranslateScreen> {
         context: context,
         builder: (contextBottomSheet) {
           return StreamBuilder(
-            stream: bloc.extractedEntities.stream,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData || snapshot.data == null) return Container();
-              final entities = snapshot.data!;
-              if (entities.isEmpty) {
-                return const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.mood_bad_outlined, size: 150, color: Colors.grey,),
-                      SizedBox(height: 10),
-                      Text("Oops no suggestion!", style: TextStyle(fontSize: 50, color: Colors.grey,), textAlign: TextAlign.center,)
-                    ],
-                  ),
-                );
-              }
-              else {
-                return ListView.builder(
-                  itemCount: entities.length,
-                  itemBuilder: (_, index) => ExtractedEntityCell(
-                    entity: entities.elementAt(index)
-                  )
-              );
-              }
-            }
-          );
-        }
-    );
+              stream: bloc.extractedEntities.stream,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || snapshot.data == null)
+                  return Container();
+                final entities = snapshot.data!;
+                if (entities.isEmpty) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.mood_bad_outlined,
+                          size: 150,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          "Oops no suggestion!",
+                          style: TextStyle(
+                            fontSize: 50,
+                            color: Colors.grey,
+                          ),
+                          textAlign: TextAlign.center,
+                        )
+                      ],
+                    ),
+                  );
+                } else {
+                  return ListView.builder(
+                      itemCount: entities.length,
+                      itemBuilder: (_, index) => ExtractedEntityCell(
+                          entity: entities.elementAt(index)));
+                }
+              });
+        });
   }
 
   Widget _switchLanguage() {
@@ -328,7 +342,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
         ),
         InkWell(
           onTap: () {},
-          child: const Icon(Icons.sync_alt_outlined),
+          child: const Icon(Icons.arrow_right_alt),
         ),
         Container(
           decoration: BoxDecoration(
@@ -355,39 +369,44 @@ class _TranslateScreenState extends State<TranslateScreen> {
           height: 50,
           width: double.infinity,
           child: Container(
-            color: AppColor.backgroundIcon,
-            child: StreamBuilder(
-              stream: bloc.recognizedText.stream,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final recognizedText = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: recognizedText.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (_, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                        child: GestureDetector(
-                          onTap: () => bloc.addWord(recognizedText.elementAt(index)),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
+              color: AppColor.backgroundIcon,
+              child: StreamBuilder(
+                stream: bloc.recognizedText.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final recognizedText = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: recognizedText.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (_, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
+                          child: GestureDetector(
+                            onTap: () =>
+                                bloc.addWord(recognizedText.elementAt(index)),
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                recognizedText.elementAt(index),
+                                style: AppTextStyle.subtitle,
+                              ),
                             ),
-                            alignment: Alignment.center,
-                            child: Text(recognizedText.elementAt(index), style: AppTextStyle.subtitle,),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                } else {
-                  return Container();
-                }
-              },
-            )
-          ),
+                        );
+                      },
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+              )),
         ),
         SizedBox(
           height: 250,
@@ -401,16 +420,19 @@ class _TranslateScreenState extends State<TranslateScreen> {
                     painter: BlackLinePainter(sequencePoints),
                     child: Listener(
                       behavior: HitTestBehavior.opaque,
-                      onPointerMove: (event) => bloc.updateSequencePoints(event.localPosition),
-                      onPointerDown: (_) =>
-                          bloc.sequencePoints.value.add(List.empty(growable: true)),
+                      onPointerMove: (event) =>
+                          bloc.updateSequencePoints(event.localPosition),
+                      onPointerDown: (_) => bloc.sequencePoints.value
+                          .add(List.empty(growable: true)),
                       onPointerUp: (_) => bloc.recognitionText(),
                     ));
               }),
         ),
         Row(
           children: [
-            const SizedBox(width: 5,),
+            const SizedBox(
+              width: 5,
+            ),
             OutlinedButton(
               onPressed: bloc.undo,
               style: ElevatedButton.styleFrom(
@@ -420,9 +442,14 @@ class _TranslateScreenState extends State<TranslateScreen> {
                 ),
                 side: const BorderSide(color: Colors.black87),
               ),
-              child: const Icon(Icons.undo, color: AppColor.backgroundIcon2,),
+              child: const Icon(
+                Icons.undo,
+                color: AppColor.backgroundIcon2,
+              ),
             ),
-            const SizedBox(width: 5,),
+            const SizedBox(
+              width: 5,
+            ),
             Expanded(
               child: OutlinedButton(
                 onPressed: bloc.addSpace,
@@ -433,10 +460,15 @@ class _TranslateScreenState extends State<TranslateScreen> {
                   ),
                   side: const BorderSide(color: Colors.black87),
                 ),
-                child: const Icon(Icons.space_bar, color: AppColor.backgroundIcon2,),
+                child: const Icon(
+                  Icons.space_bar,
+                  color: AppColor.backgroundIcon2,
+                ),
               ),
             ),
-            const SizedBox(width: 5,),
+            const SizedBox(
+              width: 5,
+            ),
             OutlinedButton(
               onPressed: bloc.deleteLastText,
               style: ElevatedButton.styleFrom(
@@ -446,20 +478,33 @@ class _TranslateScreenState extends State<TranslateScreen> {
                 ),
                 side: const BorderSide(color: Colors.black87),
               ),
-              child: const Icon(Icons.backspace_outlined, color: AppColor.backgroundIcon2,),
+              child: const Icon(
+                Icons.backspace_outlined,
+                color: AppColor.backgroundIcon2,
+              ),
             ),
-            const SizedBox(width: 5,),
+            const SizedBox(
+              width: 5,
+            ),
             OutlinedButton(
-              onPressed: () => bloc.changeWritingState(false),
+              onPressed: () {
+                bloc.addToHistory();
+                bloc.changeWritingState(false);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColor.backgroundIcon2,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Icon(Icons.arrow_forward, color: Colors.white,),
+              child: const Icon(
+                Icons.arrow_forward,
+                color: Colors.white,
+              ),
             ),
-            const SizedBox(width: 5,),
+            const SizedBox(
+              width: 5,
+            ),
           ],
         )
       ],

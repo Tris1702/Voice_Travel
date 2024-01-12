@@ -5,6 +5,8 @@ import 'package:voice_travel/data/model/translate_record.dart';
 import 'package:voice_travel/presentation/component/text_style.dart';
 import 'package:voice_travel/presentation/screen/history_record/bloc.dart';
 
+import '../../component/view_translate_record.dart';
+
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
@@ -46,6 +48,35 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Confirm Delete"),
+                      content: const Text("Are you sure you want to delete all items?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: bloc.removeAll,
+                          child: const Text("Delete"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const FaIcon(FontAwesomeIcons.trashCan, color: Colors.black87,),
+            ),
+          )
+        ],
       ),
 
       body: Container(
@@ -68,6 +99,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     return ListTile(
                       title: Text(item.sourceText, style: AppTextStyle.conversationText, overflow: TextOverflow.fade,),
                       subtitle: Text(item.targetText, style: AppTextStyle.subtitle, overflow: TextOverflow.fade,),
+                      trailing: InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("Confirm Delete"),
+                                content: const Text("Are you sure you want to delete this item?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => bloc.removeRecord(index),
+                                    child: const Text("Delete"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: const FaIcon(FontAwesomeIcons.trashCan),
+                      ),
                       onTap: () => _showDetail(context, item),
                     );
                   },
@@ -80,6 +135,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   _showDetail(BuildContext context, TranslateRecord item) {
-
+    showModalBottomSheet(context: context, builder: (_) {
+      return ViewTranslateRecord(record: item,);
+    });
   }
 }

@@ -40,6 +40,9 @@
     <!-- Provide required visibility configuration for API level 30 and above -->
     <queries>
         <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+        <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="cal" />
         </intent>
@@ -58,6 +61,10 @@
         </intent>
         <intent>
             <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
         </intent>
     </queries>
 </manifest>

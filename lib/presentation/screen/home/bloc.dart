@@ -21,7 +21,7 @@ class HomeBloc extends BlocBase {
 
   @override
   void init() {
-    // downloadAllModel();
+    downloadAllModel();
     sourceLanguage.add('English');
     targetLanguage.add('Vietnamese');
   }
@@ -31,10 +31,10 @@ class HomeBloc extends BlocBase {
     final digitalRecognizer = GetIt.I<DigitalRecognitionRepository>();
     final entityExtractor = GetIt.I<EntityExtractionRepository>();
 
-    EasyLoading.show();
+    // EasyLoading.show();
     Future.wait([translator.downloadAllModel(), digitalRecognizer.downloadAllModel(), entityExtractor.downloadAllModel()]).then((value) {
-        print("=====> ALL DONE");
-        EasyLoading.dismiss();
+        // print("=====> ALL DONE");
+        // EasyLoading.dismiss();
     });
 
   }
@@ -56,8 +56,12 @@ class HomeBloc extends BlocBase {
   }
 
   void navigateToChangeLanguage(bool isSourceLanguage, String language) {
-    appNavigator.pushed(AppRoute.changeLanguage, argument: [language, isSourceLanguage]).then((newLanguage) =>
-      isSourceLanguage ? sourceLanguage.add(newLanguage) : targetLanguage.add(newLanguage)
+    appNavigator.pushed(AppRoute.changeLanguage, argument: [language, isSourceLanguage]).then((newLanguage) {
+      if (newLanguage != null) {
+        isSourceLanguage ? sourceLanguage.add(newLanguage) : targetLanguage.add(
+            newLanguage);
+      }
+    }
     );
   }
   

@@ -11,14 +11,17 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:voice_travel/core/bloc_base.dart';
 import 'package:voice_travel/domain/repository/entity_extraction_repository.dart';
 
+import '../../../data/model/language.dart';
 import '../../../domain/repository/translate_repository.dart';
 
 class VoiceBloc extends BlocBase {
 
   final translator = GetIt.I<TranslateRepository>();
   final extractor = GetIt.I<EntityExtractionRepository>();
+  late Language sourceLanguage;
+  late Language targetLanguage;
 
-  BehaviorSubject<List<Tuple2<String, String>>> conversation = BehaviorSubject<List<Tuple2<String, String>>>.seeded(List.empty(growable: true));
+
   BehaviorSubject<List<Entity>> annotations = BehaviorSubject<List<Entity>>.seeded(List.empty(growable: true));
   PublishSubject<bool> isListening = PublishSubject();
 
@@ -72,11 +75,12 @@ class VoiceBloc extends BlocBase {
     Fluttertoast.showToast(msg: 'Copied');
   }
 
-  void readInputText() => readOutLoud(inputTextController.text);
-  void readOutputText() => readOutLoud(outputTextController.text);
+  void readInputText() => readOutLoud(sourceLanguage.code, inputTextController.text);
+  void readOutputText() => readOutLoud(targetLanguage.code, outputTextController.text);
 
-  Future<void> readOutLoud(String? text) async {
+  Future<void> readOutLoud(String languageCode, String? text) async {
     if (text == null) return;
+    await flutterTts.setLanguage(languageCode);
     flutterTts.speak(text);
     await flutterTts.awaitSpeakCompletion(true);
   }
@@ -93,7 +97,7 @@ class VoiceBloc extends BlocBase {
     isListening.add(true);
     speech.listen(
         onResult: (result) => _onSpeechResult(result),
-        localeId: "en_EN",
+        localeId: sourceLanguage.code,
     );
   }
 

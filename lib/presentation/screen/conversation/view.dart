@@ -34,8 +34,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   void initState() {
-    bloc.sourceLanguage = widget.sourceLanguage;
-    bloc.targetLanguage = widget.targetLanguage;
+    bloc.sourceLanguage = Language.fromName(widget.sourceLanguage);
+    bloc.targetLanguage = Language.fromName(widget.targetLanguage);
     Permission.microphone.onGrantedCallback(() => bloc.init());
     super.initState();
     _requestPermission();
@@ -112,12 +112,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               MicroWidget(
-                language: Language.fromName(bloc.sourceLanguage),
+                language: bloc.sourceLanguage,
                 bloc: bloc,
                 isLeft: true,
               ),
               MicroWidget(
-                language: Language.fromName(bloc.targetLanguage),
+                language: bloc.targetLanguage,
                 bloc: bloc,
                 isLeft: false,
               ),

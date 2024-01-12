@@ -11,8 +11,8 @@ import '../../../domain/repository/translate_repository.dart';
 
 class ConversationBloc extends BlocBase {
 
-  var sourceLanguage = "english";
-  var targetLanguage = "vietnamese";
+  late Language sourceLanguage;
+  late Language targetLanguage;
 
   BehaviorSubject<List<Tuple3<String, String, bool>>> conversation = BehaviorSubject<List<Tuple3<String,String, bool>>>.seeded(List.empty(growable: true));
   final BehaviorSubject<bool> isListeningLeft = BehaviorSubject.seeded(false);
@@ -85,13 +85,13 @@ class ConversationBloc extends BlocBase {
     if (isLeft) {
       speech.listen(
           onResult: (result) => _onSpeechResult(result, isLeft),
-          localeId: "en_EN",
+          localeId: sourceLanguage.code,
           listenFor: const Duration(seconds: 10)
       ).then((value) => _changeListening(isLeft));
     } else {
       speech.listen(
           onResult: (result) => _onSpeechResult(result, isLeft),
-          localeId: "vi_VN",
+          localeId: targetLanguage.code,
           listenFor: const Duration(seconds: 10)
       ).then((value) => _changeListening(isLeft));
     }

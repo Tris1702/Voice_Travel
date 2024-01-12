@@ -97,7 +97,7 @@ class _MyHomeState extends State<MyHome> {
         ),
         InkWell(
             onTap: () {},
-            child: const Icon(Icons.sync_alt_outlined),
+            child: const Icon(Icons.arrow_right_alt),
         ),
         StreamBuilder(
             stream: bloc.targetLanguage.stream,

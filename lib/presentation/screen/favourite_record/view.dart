@@ -47,6 +47,35 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
             ),
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Confirm Delete"),
+                      content: const Text("Are you sure you want to delete all items?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: bloc.removeAll,
+                          child: const Text("Delete"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const FaIcon(FontAwesomeIcons.trashCan, color: Colors.black87,),
+            ),
+          )
+        ],
       ),
 
       body: Container(
@@ -70,7 +99,27 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       title: Text(item.sourceText, style: AppTextStyle.conversationText, overflow: TextOverflow.fade,),
                       subtitle: Text(item.targetText, style: AppTextStyle.subtitle, overflow: TextOverflow.fade,),
                       trailing: InkWell(
-                        onTap: () => bloc.removeRecord(index),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("Confirm Delete"),
+                                content: const Text("Are you sure you want to delete this item?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => bloc.removeRecord(index),
+                                    child: const Text("Delete"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                         child: const FaIcon(FontAwesomeIcons.trashCan),
                       ),
                       onTap: () => _showDetail(context, item),

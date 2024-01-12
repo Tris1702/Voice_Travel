@@ -60,10 +60,11 @@ class TranslateBloc extends BlocBase {
     Fluttertoast.showToast(msg: 'Copied');
   }
 
-  void readInputText() => readOutLoud(inputTextController.text);
-  void readOutputText() => readOutLoud(outputTextController.text);
+  void readInputText() => readOutLoud(sourceLanguage.code, inputTextController.text);
+  void readOutputText() => readOutLoud(targetLanguage.code, outputTextController.text);
 
-  Future<void> readOutLoud(String? text) async {
+  Future<void> readOutLoud(String languageCode, String? text) async {
+    await flutterTts.setLanguage(languageCode);
     if (text == null) return;
     flutterTts.speak(text);
     await flutterTts.awaitSpeakCompletion(true);
@@ -122,7 +123,6 @@ class TranslateBloc extends BlocBase {
   void extractEntities() async {
     print("===> extracting...");
     List<EntityAnnotation> inputEntities = await entityExtractor.extractEntities(inputTextController.text);
-    // List<EntityAnnotation> outputEntities = await entityExtractor.extractEntities(outputTextController.text);
     print("===> extracted ${inputEntities.length}");
     extractedEntities.value = inputEntities;
     extractedEntities.sink.add(extractedEntities.value);
@@ -132,6 +132,11 @@ class TranslateBloc extends BlocBase {
     database.addFav(TranslateRecord(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage, sourceText: inputTextController.text, targetText: outputTextController.text)).then((_) =>
       Fluttertoast.showToast(msg: "Added to favourite")
     );
+  }
+
+  void addToHistory() {
+    if (inputTextController.text.isEmpty || outputTextController.text.isEmpty) return;
+    database.addHistory(TranslateRecord(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage, sourceText: inputTextController.text, targetText: outputTextController.text));
   }
 
   void navigateToHistory() {

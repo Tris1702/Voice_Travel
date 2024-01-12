@@ -29,7 +29,7 @@ class ViewTranslateRecord extends StatelessWidget {
       children: [
         Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20, right: 50),
               child: Card(
                 color: AppColor.onBackground,
                 elevation: 0,
@@ -80,7 +80,7 @@ class ViewTranslateRecord extends StatelessWidget {
                 Clipboard.setData(ClipboardData(text: text)).then((_) =>
                 Fluttertoast.showToast(msg: 'Copied'));
               },
-              child: Icon(Icons.copy),
+              child: const Icon(Icons.copy),
             )
           )
         )
