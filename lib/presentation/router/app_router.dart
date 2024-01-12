@@ -7,6 +7,7 @@ import 'package:voice_travel/presentation/screen/home/view.dart';
 import 'package:voice_travel/presentation/screen/translate/view.dart';
 import 'package:voice_travel/presentation/screen/voice/view.dart';
 
+import '../../data/model/language.dart';
 import '../screen/live_translate/text_detector_view.dart';
 
 class AppRoute {
@@ -23,8 +24,9 @@ class AppRoute {
   static Route<dynamic> getAppPage(RouteSettings routeSettings) {
     switch (routeSettings.name) {
       case camera:
+        final arguments = routeSettings.arguments as List<String>;
         return MaterialPageRoute(
-          builder: (BuildContext context) => TextRecognizerView(),
+          builder: (BuildContext context) => TextRecognizerView(sourceLanguage: arguments.first, targetLanguage: arguments.last,),
         );
       case translateText:
         final arguments = routeSettings.arguments as List<String>?;

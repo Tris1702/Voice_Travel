@@ -21,6 +21,8 @@ class CameraBloc extends BlocBase {
   CameraController? controller;
   String displayImagePath = '';
   late InputImage inputImage;
+  late String sourceLanguage;
+  late String targetLanguage;
 
   @override
   void dispose() {
@@ -70,7 +72,7 @@ class CameraBloc extends BlocBase {
   void showResult(String originalText, String translatedText) async {
     if (EasyLoading.isShow) EasyLoading.dismiss();
     print('=====> translatedText $translatedText');
-    appNavigator.pushed(AppRoute.translateText, argument: [originalText, translatedText]).then((_) {
+    appNavigator.pushed(AppRoute.translateText, argument: [originalText, translatedText, sourceLanguage, targetLanguage]).then((_) {
         controller?.resumePreview();
       }
     );

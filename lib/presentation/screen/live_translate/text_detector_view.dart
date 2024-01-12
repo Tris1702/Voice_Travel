@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:voice_travel/data/model/language.dart';
 
 import '../../component/text_detector_painter.dart';
 import 'bloc.dart';
@@ -11,20 +12,30 @@ import 'detector_view.dart';
 class TextRecognizerView extends StatefulWidget {
   CameraBloc bloc = GetIt.I<CameraBloc>();
 
-  TextRecognizerView({super.key});
+  TextRecognizerView({super.key, required this.sourceLanguage, required this.targetLanguage});
 
+  final String sourceLanguage;
+  final String targetLanguage;
   @override
   State<TextRecognizerView> createState() => _TextRecognizerViewState();
 }
 
 class _TextRecognizerViewState extends State<TextRecognizerView> {
-  final _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+  late final _textRecognizer;
   bool _canProcess = true;
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back;
 
+  @override
+  void initState() {
+    final _sourceLanguage = Language.fromName(widget.sourceLanguage);
+    widget.bloc.sourceLanguage = widget.sourceLanguage;
+    widget.bloc.targetLanguage = widget.targetLanguage;
+    _textRecognizer = TextRecognizer(script: _sourceLanguage.toTextRecognitionScript());
+    super.initState();
+  }
 
   @override
   void dispose() async {

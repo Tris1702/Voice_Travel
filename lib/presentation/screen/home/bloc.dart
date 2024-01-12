@@ -52,7 +52,7 @@ class HomeBloc extends BlocBase {
   }
 
   void navigateToLiveTranslate() {
-    appNavigator.pushed(AppRoute.camera);
+    appNavigator.pushed(AppRoute.camera, argument: [sourceLanguage.value, targetLanguage.value]);
   }
 
   void navigateToChangeLanguage(bool isSourceLanguage, String language) {
